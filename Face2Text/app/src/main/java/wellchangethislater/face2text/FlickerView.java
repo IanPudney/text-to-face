@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
@@ -79,6 +80,7 @@ public class FlickerView extends Activity {
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.my_custom_layout);
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -86,7 +88,12 @@ public class FlickerView extends Activity {
 
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
-                //handleSendText(intent); // Handle text being sent
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    TextView headsup = (TextView) findViewById(R.id.textView);
+                    headsup.setText(sharedText);
+                }
+
             }
         }
         //TextView headsup = (TextView) findViewById(R.id.textView);

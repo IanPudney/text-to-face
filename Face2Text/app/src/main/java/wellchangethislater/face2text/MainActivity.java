@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -74,6 +75,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mView = buildView();
         camera = getCameraInstance();
@@ -276,7 +278,7 @@ String path;
                 Log.d("", response.toString());
                 HttpEntity rEntity = response.getEntity();//end load bar
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                Log.d("response body",responseString);
+                Log.d("response body", responseString);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, responseString);
