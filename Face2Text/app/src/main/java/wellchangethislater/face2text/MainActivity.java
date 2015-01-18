@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
@@ -36,6 +37,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -185,16 +187,18 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, TAKE_PICTURE_REQUEST);
     }
 
-String thumbnailPath;
+String path;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TAKE_PICTURE_REQUEST && resultCode == RESULT_OK) {
-            thumbnailPath = data.getStringExtra(Intents.EXTRA_THUMBNAIL_FILE_PATH);
+            String thumbnailPath = data.getStringExtra(Intents.EXTRA_THUMBNAIL_FILE_PATH);
             String picturePath = data.getStringExtra(Intents.EXTRA_PICTURE_FILE_PATH);
-
+            path = picturePath;
             processPictureWhenReady(picturePath);
-            // TODO: Show the thumbnail to the user while the full picture is being
-            // processed.
+
+            //path = path.replace("/storage/emulated/0", "/Internal Storage");
+              //  Log.d("path2",data.getDataString());
+               // path = data.getData().toString();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -204,7 +208,12 @@ String thumbnailPath;
         final File pictureFile = new File(picturePath);
 
         if (pictureFile.exists()) {
-            // The picture is ready; process it.
+            new Thread(new Runnable(){
+                @Override
+                public void run() {
+                    sendToServer();
+                }
+            }).start();
         } else {
             // The file does not exist yet. Before starting the file observer, you
             // can update your UI to let the user know that the application is
@@ -243,24 +252,18 @@ String thumbnailPath;
             };
             observer.startWatching();
         }
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                sendToServer();
-            }
-        }).start();
-
     }
 
     public void sendToServer() {
         //String filename = findHighest();
 
-        File file = new File(thumbnailPath);
+        File file = new File(path);
         try {
             HttpClient client = new DefaultHttpClient();
 
             MultipartEntityBuilder entity = MultipartEntityBuilder.create();
             //entity.addPart("file", new FileBody(file));
+            Log.d("path", path);
 
             entity.addBinaryBody("file", file, ContentType.create("image/jpeg"), file.getName());
 
@@ -269,8 +272,11 @@ String thumbnailPath;
             Log.d("sdf", post.toString());
 
             try {
-                HttpResponse response = client.execute(post);
+                HttpResponse response = client.execute(post);//push load bar
                 Log.d("", response.toString());
+                HttpEntity rEntity = response.getEntity();//end load bar
+                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                Log.d("response body",responseString);
             } catch (IOException e) {
                 e.printStackTrace();
             }
