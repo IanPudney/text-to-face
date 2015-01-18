@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * An {@link Activity} showing a tuggable "Hello World!" card.
  * <p/>
@@ -27,95 +30,78 @@ import android.widget.TextView;
  */
 public class FlickerView extends Activity {
 
-    /**
-     * {@link CardScrollView} to use as the main content view.
-     */
-    private CardScrollView mCardScroller;
+    //Speedreader:
+    public String[] wordArray;
+    public int currentIndex;
+    public int maxIndex;
+    TextView displayedFront;
+    TextView displayedMiddle;
+    TextView displayedBack;
+    Timer timer;
+    int wpm;
 
-    private View mView;
-
-    /*protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
-
-        mView = buildView();
-
-        mCardScroller = new CardScrollView(this);
-        mCardScroller.setAdapter(new CardScrollAdapter() {
-            @Override
-            public int getCount() {
-                return 1;
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return mView;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                return mView;
-            }
-
-            @Override
-            public int getPosition(Object item) {
-                if (mView.equals(item)) {
-                    return 0;
-                }
-                return AdapterView.INVALID_POSITION;
-            }
-        });
-
-        // Handle the TAP event.
-        mCardScroller.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Plays disallowed sound to indicate that TAP actions are not supported.
-                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                am.playSoundEffect(Sounds.DISALLOWED);
-            }
-        });
-        setContentView(mCardScroller);
-    }*/
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.my_custom_layout);
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
 
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
-            if ("text/plain".equals(type)) {
-                //handleSendText(intent); // Handle text being sent
+        Intent intent = getIntent();
+        String message = "This is a callibration message.  Please read all the words and ensure it works correctly.  Thank you for your cooperation.";//intent.getStringExtra("EXTRA_MESSAGE");
+        wordArray = message.split(" ");
+        currentIndex = -1;
+        maxIndex = wordArray.length - 1;
+        wpm = 300;//intent.getIntExtra("EXTRA_WPM", 300);
+        long period = 60000 / wpm;
+
+        displayedFront = (TextView)findViewById(R.id.first_letters);
+        displayedFront.setTextSize(40);
+        displayedMiddle = (TextView)findViewById(R.id.middle_letter);
+        displayedMiddle.setTextSize(40);
+        displayedBack = (TextView)findViewById(R.id.last_letters);
+        displayedBack.setTextSize(40);
+
+        displayedFront.setText("");
+        displayedMiddle.setText("O");
+        displayedBack.setText("");
+
+        final Runnable displayNextWord = new Runnable() {
+            public void run() {
+                if (currentIndex < maxIndex) {
+                    ++currentIndex;
+                } else {
+                    timer.cancel();
+                    finish();
+                    return;
+                }
+                printWord(wordArray[currentIndex]);
             }
-        }
-        //TextView headsup = (TextView) findViewById(R.id.textView);
+        };
+
+        TimerTask callDisplayNextWord = new TimerTask() {
+            int i = 1;
+            public void run() {
+                runOnUiThread(displayNextWord);
+            }
+        };
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(callDisplayNextWord,1000,period);
+    }
+
+    public void printWord(String word) {
+        int frontLength = (word.length() + 2) / 4;
+        displayedFront.setText(word.substring(0,frontLength));
+        displayedMiddle.setText(word.substring(frontLength,frontLength+1));
+        displayedBack.setText(word.substring(frontLength+1,word.length()));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //mCardScroller.activate();
     }
 
     @Override
     protected void onPause() {
-        //mCardScroller.deactivate();
         super.onPause();
     }
-
-    /**
-     * Builds a Glass styled "Hello World!" view using the {@link CardBuilder} class.
-     */
-    /*
-    private View buildView() {
-        CardBuilder card = new CardBuilder(this, CardBuilder.Layout.EMBED_INSIDE)
-                .setEmbeddedLayout(R.layout.food_table)
-                .getView();
-
-
-        card.setText(R.string.hello_world);
-        return card.getView();
-    }*/
-
 }
