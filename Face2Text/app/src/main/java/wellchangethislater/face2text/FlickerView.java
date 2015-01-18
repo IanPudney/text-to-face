@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -39,11 +40,12 @@ public class FlickerView extends Activity {
     TextView displayedMiddle;
     TextView displayedBack;
     Timer timer;
-    int wpm;
+    long period;
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.my_custom_layout);
 
@@ -62,8 +64,8 @@ public class FlickerView extends Activity {
 
         currentIndex = -1;
         maxIndex = wordArray.length - 1;
-        wpm = 300;//intent.getIntExtra("EXTRA_WPM", 300);
-        long period = 60000 / wpm;
+        int wpm = 300;//intent.getIntExtra("EXTRA_WPM", 300);
+        period = 60000 / wpm;
 
         displayedFront = (TextView)findViewById(R.id.first_letters);
         displayedMiddle = (TextView)findViewById(R.id.middle_letter);
@@ -73,44 +75,48 @@ public class FlickerView extends Activity {
         displayedMiddle.setText("O");
         displayedBack.setText("");
 
-        final Runnable displayNextWord = new Runnable() {
-            public void run() {
-                if (currentIndex < maxIndex) {
-                    ++currentIndex;
-                } else {
-                    timer.cancel();
-                    finish();
-                    return;
-                }
-                printWord(wordArray[currentIndex]);
-            }
-        };
-
-        TimerTask callDisplayNextWord = new TimerTask() {
-            public void run() {
-                runOnUiThread(displayNextWord);
-            };
-        };
-
         timer = new Timer();
-        timer.scheduleAtFixedRate(callDisplayNextWord,1000,period);
+        timer.schedule(callDisplayNextWord, 1000, period);
     }
+
+    final Runnable displayNextWord = new Runnable() {
+        public void run() {
+            if (currentIndex < maxIndex) {
+                ++currentIndex;
+            } else {
+                timer.cancel();
+                finish();
+                return;
+            }
+            printWord(wordArray[currentIndex]);
+        }
+    };
+
+    TimerTask callDisplayNextWord = new TimerTask() {
+        public void run() {
+            runOnUiThread(displayNextWord);
+        };
+    };
 
     public void printWord(String word) {
         int wlength = word.length();
-        if (wlength > 10 && wlength < 13) {
-            String next_word = word.substring(wlength-4,wlength);
+        if (wlength > 11) {
+            String next_word = word.substring(wlength/2,wlength);
             wordArray[currentIndex] = next_word;
             --currentIndex;
-            word = word.substring(0,wlength-4) + "-";
-            wlength = word.length();
-        } else if (wlength > 14) {
-            String next_word = word.substring(10,wlength);
-            wordArray[currentIndex] = next_word;
-            --currentIndex;
-            word = word.substring(0,10) + "-";
+            word = word.substring(0,wlength/2) + "-";
             wlength = word.length();
         }
+        double multiplier = 1.0;
+        if (wlength < 4) {
+            multiplier = 0.7;
+        } else if (wlength > 9) {
+            multiplier = 1.5;
+        } else if (wlength > 6) {
+            multiplier = 1.2;
+        }
+        timer.schedule(callDisplayNextWord,1000, (long)(period * multiplier));
+
         int frontLength = (wlength + 2) / 4;
         displayedFront.setText(word.substring(0,frontLength));
         displayedMiddle.setText(word.substring(frontLength,frontLength+1));
