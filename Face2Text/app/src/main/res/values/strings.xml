@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Face2Text</string>
+    <string name="title_activity_main">FACE TEXT</string>
+    <string name="hello_world">Words for your face.</string>
+
+</resources>
