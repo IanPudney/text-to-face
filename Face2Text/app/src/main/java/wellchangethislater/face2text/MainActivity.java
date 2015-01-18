@@ -8,6 +8,8 @@ import com.google.android.glass.widget.CardScrollView;
 import com.google.android.glass.widget.Slider;
 //import com.google.gwt.core.client.JavascriptObject;
 
+import wellchangethislater.face2text.CameraSurfaceView;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -76,13 +78,15 @@ public class MainActivity extends Activity {
     private int wpm = 300;
     private GestureDetector mGestureDetector;
 
+    private CameraSurfaceView cameraView;
+
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mView = buildView();
+        //mView = buildView();
         camera = getCameraInstance();
         mCardScroller = new CardScrollView(this);
         mCardScroller.setAdapter(new CardScrollAdapter() {
@@ -119,7 +123,8 @@ public class MainActivity extends Activity {
                 takePicture();
             }
         });
-        setContentView(mCardScroller);
+        //setContentView(mCardScroller);
+        this.setContentView(cameraView);
         mGestureDetector = createGestureDetector(this);
     }
 
@@ -139,12 +144,20 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mCardScroller.activate();
+        // Do not hold the camera during onResume
+        if (cameraView != null) {
+            cameraView.releaseCamera();
+        }
     }
 
     @Override
     protected void onPause() {
         mCardScroller.deactivate();
         super.onPause();
+        // Do not hold the camera during onPause
+        if (cameraView != null) {
+            cameraView.releaseCamera();
+        }
     }
 
     /**
