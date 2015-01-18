@@ -62,7 +62,7 @@ public class FlickerView extends Activity {
 
         currentIndex = -1;
         maxIndex = wordArray.length - 1;
-        wpm = 300;//intent.getIntExtra("EXTRA_WPM", 300);
+        wpm = 400;//intent.getIntExtra("EXTRA_WPM", 300);
         long period = 60000 / wpm;
 
         displayedFront = (TextView)findViewById(R.id.first_letters);
