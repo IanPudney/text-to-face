@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#000000">
+
+    <View
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/center_block"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="x"
+        android:textColor="#ff0000"
+        android:id="@+id/middle_letter"
+        android:textSize="40dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/center_block" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="D"
+        android:id="@+id/first_letters"
+        android:textColor="#ffffff"
+        android:textSize="40dp"
+        android:layout_alignTop="@+id/middle_letter"
+        android:layout_toStartOf="@+id/middle_letter" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bbq"
+        android:id="@+id/last_letters"
+        android:textColor="#ffffff"
+        android:textSize="40dp"
+        android:layout_alignBottom="@+id/middle_letter"
+        android:layout_toEndOf="@+id/middle_letter" />
+</RelativeLayout>

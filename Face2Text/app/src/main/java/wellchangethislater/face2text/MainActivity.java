@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -75,6 +76,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mView = buildView();
         camera = getCameraInstance();
@@ -259,9 +261,14 @@ String path;
                 Log.d("", response.toString());
                 HttpEntity rEntity = response.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                card.setText("Tap to read...");
+
                 Log.d("response body", responseString);
                 //call Derek's code now
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, responseString);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
             } catch (IOException e) {
                 e.printStackTrace();
             }
