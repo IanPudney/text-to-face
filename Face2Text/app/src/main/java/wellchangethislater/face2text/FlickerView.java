@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
@@ -43,11 +44,22 @@ public class FlickerView extends Activity {
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.my_custom_layout);
 
         Intent intent = getIntent();
-        String message = "This is a callibration message.  Please read all the words and ensure it works correctly.  Thank you for your cooperation.";//intent.getStringExtra("EXTRA_MESSAGE");
-        wordArray = message.split(" ");
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    wordArray = sharedText.split(" ");
+                }
+            }
+        };
+
         currentIndex = -1;
         maxIndex = wordArray.length - 1;
         wpm = 300;//intent.getIntExtra("EXTRA_WPM", 300);
@@ -78,10 +90,9 @@ public class FlickerView extends Activity {
         };
 
         TimerTask callDisplayNextWord = new TimerTask() {
-            int i = 1;
             public void run() {
                 runOnUiThread(displayNextWord);
-            }
+            };
         };
 
         timer = new Timer();
