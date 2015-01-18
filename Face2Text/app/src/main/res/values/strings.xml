@@ -4,5 +4,6 @@
     <string name="app_name">Face2Text</string>
     <string name="title_activity_main">FACE TEXT</string>
     <string name="hello_world">Words for your face.</string>
+    <string name="title_activity_flicker_view">Flicker View</string>
 
 </resources>

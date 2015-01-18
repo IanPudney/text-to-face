@@ -277,6 +277,11 @@ String path;
                 HttpEntity rEntity = response.getEntity();//end load bar
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 Log.d("response body",responseString);
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, responseString);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
             } catch (IOException e) {
                 e.printStackTrace();
             }
