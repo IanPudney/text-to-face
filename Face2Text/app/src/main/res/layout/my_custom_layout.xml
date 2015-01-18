@@ -40,4 +40,21 @@
         android:textColor="#ffffff"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/middle_letter" />
+
+    <View
+        android:layout_height="4dp"
+        android:layout_width="wrap_content"
+        android:id="@+id/top_line"
+        android:background="#ffffff"
+        android:layout_alignBottom="@+id/center_object"
+        android:layout_centerHorizontal="true" />
+
+    <View
+        android:layout_height="4dp"
+        android:layout_width="wrap_content"
+        android:id="@+id/bottom_line"
+        android:background="#ffffff"
+        android:layout_alignTop="@+id/center_object"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

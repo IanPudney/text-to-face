@@ -66,11 +66,8 @@ public class FlickerView extends Activity {
         long period = 60000 / wpm;
 
         displayedFront = (TextView)findViewById(R.id.first_letters);
-        displayedFront.setTextSize(40);
         displayedMiddle = (TextView)findViewById(R.id.middle_letter);
-        displayedMiddle.setTextSize(40);
         displayedBack = (TextView)findViewById(R.id.last_letters);
-        displayedBack.setTextSize(40);
 
         displayedFront.setText("");
         displayedMiddle.setText("O");
@@ -100,7 +97,21 @@ public class FlickerView extends Activity {
     }
 
     public void printWord(String word) {
-        int frontLength = (word.length() + 2) / 4;
+        int wlength = word.length();
+        if (wlength > 10 && wlength < 13) {
+            String next_word = word.substring(wlength-4,wlength);
+            wordArray[currentIndex] = next_word;
+            --currentIndex;
+            word = word.substring(0,wlength-4) + "-";
+            wlength = word.length();
+        } else if (wlength > 14) {
+            String next_word = word.substring(10,wlength);
+            wordArray[currentIndex] = next_word;
+            --currentIndex;
+            word = word.substring(0,10) + "-";
+            wlength = word.length();
+        }
+        int frontLength = (wlength + 2) / 4;
         displayedFront.setText(word.substring(0,frontLength));
         displayedMiddle.setText(word.substring(frontLength,frontLength+1));
         displayedBack.setText(word.substring(frontLength+1,word.length()));
