@@ -8,8 +8,6 @@ import com.google.android.glass.widget.CardScrollView;
 import com.google.android.glass.widget.Slider;
 //import com.google.gwt.core.client.JavascriptObject;
 
-import wellchangethislater.face2text.CameraSurfaceView;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -50,7 +48,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.Override;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -75,18 +72,13 @@ public class MainActivity extends Activity {
     private View mView;
     private Camera.PictureCallback mPicture;
 
-    private int wpm = 300;
-    private GestureDetector mGestureDetector;
-
-    private CameraSurfaceView cameraView;
-
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //mView = buildView();
+        mView = buildView();
         camera = getCameraInstance();
         mCardScroller = new CardScrollView(this);
         mCardScroller.setAdapter(new CardScrollAdapter() {
@@ -123,11 +115,10 @@ public class MainActivity extends Activity {
                 takePicture();
             }
         });
-        //setContentView(mCardScroller);
-        this.setContentView(cameraView);
-        mGestureDetector = createGestureDetector(this);
-    }
+        setContentView(mCardScroller);
 
+
+    }
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
@@ -144,20 +135,12 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mCardScroller.activate();
-        // Do not hold the camera during onResume
-        if (cameraView != null) {
-            cameraView.releaseCamera();
-        }
     }
 
     @Override
     protected void onPause() {
         mCardScroller.deactivate();
         super.onPause();
-        // Do not hold the camera during onPause
-        if (cameraView != null) {
-            cameraView.releaseCamera();
-        }
     }
 
     /**
@@ -181,12 +164,11 @@ public class MainActivity extends Activity {
 
     }
 
-    String path;
+String path;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TAKE_PICTURE_REQUEST && resultCode == RESULT_OK) {
             card.setText("Please wait for parsing...");
-            card.setFooter("WPM: " + Integer.toString(wpm));
             View cardView = card.getView();
 // Display the card we just created
             setContentView(cardView);
@@ -285,7 +267,6 @@ public class MainActivity extends Activity {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, responseString);
-                intent.putExtra("EXTRA_WPM", wpm);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
             } catch (IOException e) {
@@ -294,48 +275,6 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private GestureDetector createGestureDetector(Context context) {
-        GestureDetector gestureDetector = new GestureDetector(context);
-        //Create a base listener for generic gestures
-        gestureDetector.setBaseListener( new GestureDetector.BaseListener() {
-            @Override
-            public boolean onGesture(Gesture gesture) {
-                if (gesture == Gesture.SWIPE_RIGHT) {
-                    wpm += 50;
-                    return true;
-                } else if (gesture == Gesture.SWIPE_LEFT) {
-                    wpm -= 50;
-                    return true;
-                }
-                return false;
-            }
-        });
-        return gestureDetector;
-    }
-
-    /*
-     * Send generic motion events to the gesture detector
-     */
-    @Override
-    public boolean onGenericMotionEvent(MotionEvent event) {
-        if (mGestureDetector != null) {
-            return mGestureDetector.onMotionEvent(event);
-        }
-        return false;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putInt("wpm", wpm);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        wpm = savedInstanceState.getInt("wpm");
     }
 
 }

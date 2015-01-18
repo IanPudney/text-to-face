@@ -62,11 +62,9 @@ public class FlickerView extends Activity {
             }
         };
 
-        Toast.makeText(getApplicationContext(),Integer.toString(wordArray.length) + " words found!",Toast.LENGTH_SHORT).show();
-
         currentIndex = -1;
         maxIndex = wordArray.length - 1;
-        int wpm = intent.getIntExtra("EXTRA_WPM", 300);
+        int wpm = 400;//intent.getIntExtra("EXTRA_WPM", 300);
         period = 60000 / wpm;
 
         displayedFront = (TextView)findViewById(R.id.first_letters);
